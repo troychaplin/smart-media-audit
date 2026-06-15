@@ -1,0 +1,63 @@
+<?php
+namespace WP_Media_Audit\Admin;
+
+use WP_Media_Audit\Scanner\Batch_Runner;
+use WP_Media_Audit\DB\Index_Table;
+
+class Ajax_Handler {
+
+	public static function register(): void {
+		add_action( 'wp_ajax_media_audit_progress',  array( __CLASS__, 'handle_progress' ) );
+		add_action( 'wp_ajax_media_audit_scan',      array( __CLASS__, 'handle_scan' ) );
+		add_action( 'wp_ajax_media_audit_locations', array( __CLASS__, 'handle_locations' ) );
+	}
+
+	public static function handle_progress(): void {
+		check_ajax_referer( 'media_audit_nonce', 'nonce' );
+		// A nonce is anti-CSRF, not authorization — gate on capability too.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+		wp_send_json_success( Batch_Runner::get_progress() );
+	}
+
+	public static function handle_scan(): void {
+		check_ajax_referer( 'media_audit_nonce', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+		Batch_Runner::start_fresh();
+		wp_send_json_success( array( 'message' => 'Scan started' ) );
+	}
+
+	public static function handle_locations(): void {
+		check_ajax_referer( 'media_audit_nonce', 'nonce' );
+		// Without this, any logged-in user with a valid nonce could enumerate
+		// titles of private/draft posts via the locations data.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+
+		$attachment_id = (int) ( $_GET['attachment_id'] ?? 0 );
+		if ( ! $attachment_id ) {
+			wp_send_json_error( 'Missing attachment_id' );
+		}
+
+		// Build a capability-aware edit URL server-side so the client doesn't
+		// assume a hardcoded /wp-admin path.
+		$locations = array_map(
+			static function ( $loc ) {
+				return array(
+					'ID'             => (int) $loc->ID,
+					'post_title'     => $loc->post_title,
+					'post_type'      => $loc->post_type,
+					'reference_type' => $loc->reference_type,
+					'edit_url'       => get_edit_post_link( (int) $loc->ID, 'raw' ) ?: '',
+				);
+			},
+			Index_Table::get_locations( $attachment_id )
+		);
+
+		wp_send_json_success( $locations );
+	}
+}
