@@ -202,7 +202,7 @@ export default function App() {
 					} ),
 			},
 		],
-		[ handleDeleteSingle ]
+		[ handleDeleteSingle, indexBuilt ]
 	);
 
 	const actions = useMemo(
