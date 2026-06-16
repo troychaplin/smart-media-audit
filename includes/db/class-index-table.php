@@ -5,6 +5,32 @@ class Index_Table {
 
 	const TABLE_NAME = 'media_audit_index';
 
+	/** Object-cache group for list-query results. */
+	const CACHE_GROUP = 'media_audit';
+
+	/**
+	 * Current cache-busting marker for the group.
+	 *
+	 * Mirrors core's wp_cache_get_last_changed() pattern: query results are
+	 * keyed by this value, and any write bumps it — invalidating every cached
+	 * result at once without tracking individual keys. Benefits sites with a
+	 * persistent object cache (Redis/Memcached); a no-op-but-harmless on sites
+	 * without one.
+	 */
+	private static function last_changed(): string {
+		$last_changed = wp_cache_get( 'last_changed', self::CACHE_GROUP );
+		if ( false === $last_changed ) {
+			$last_changed = (string) microtime( true );
+			wp_cache_set( 'last_changed', $last_changed, self::CACHE_GROUP );
+		}
+		return (string) $last_changed;
+	}
+
+	/** Invalidate every cached list query. Called on any write to the index. */
+	public static function flush_cache(): void {
+		wp_cache_set( 'last_changed', (string) microtime( true ), self::CACHE_GROUP );
+	}
+
 	public static function table_name(): string {
 		global $wpdb;
 		return $wpdb->prefix . self::TABLE_NAME;
@@ -44,6 +70,7 @@ class Index_Table {
 		$table = self::table_name();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$wpdb->query( "DELETE FROM {$table}" );
+		self::flush_cache();
 	}
 
 	/**
@@ -74,6 +101,8 @@ class Index_Table {
 				array( '%d', '%d', '%s', '%d', '%s' )
 			);
 		}
+
+		self::flush_cache();
 	}
 
 	/**
@@ -296,6 +325,15 @@ class Index_Table {
 		$posts_table = $wpdb->posts;
 		$offset      = ( $page - 1 ) * $per_page;
 
+		// Serve from cache when an identical query was run since the last write.
+		$cache_key = 'rest_' . md5( wp_json_encode( array(
+			$search, $per_page, $page, $orderby, $order, $media_type, $reference_type, $usage_filter,
+		) ) ) . '_' . self::last_changed();
+		$cached = wp_cache_get( $cache_key, self::CACHE_GROUP );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		// Attachment base condition (always applied).
 		$base_where = "p.post_type = 'attachment' AND p.post_status = 'inherit'";
 
@@ -419,10 +457,13 @@ class Index_Table {
 		);
 		// phpcs:enable
 
-		return array(
+		$result = array(
 			'items' => $items ?: array(),
 			'total' => (int) $count,
 		);
+		wp_cache_set( $cache_key, $result, self::CACHE_GROUP );
+
+		return $result;
 	}
 
 	/**
@@ -433,6 +474,7 @@ class Index_Table {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$wpdb->delete( self::table_name(), array( 'source_post_id' => $source_post_id ), array( '%d' ) );
+		self::flush_cache();
 	}
 
 	/**
@@ -443,5 +485,6 @@ class Index_Table {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$wpdb->delete( self::table_name(), array( 'attachment_id' => $attachment_id ), array( '%d' ) );
+		self::flush_cache();
 	}
 }

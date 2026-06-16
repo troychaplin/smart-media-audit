@@ -10,6 +10,7 @@ class Batch_Runner {
 	const CURSOR_KEY    = 'media_audit_cursor';
 	const PROGRESS_KEY  = 'media_audit_progress';
 	const INDEX_BUILT_KEY = 'media_audit_index_built';
+	const ATTACHMENT_IDS_KEY = 'media_audit_attachment_ids';
 
 	/** Post types scanned for media references. */
 	const SCAN_POST_TYPES = array( 'post', 'page', 'wp_template', 'wp_template_part' );
@@ -36,6 +37,7 @@ class Batch_Runner {
 		self::unschedule();
 		Index_Table::truncate();
 		delete_transient( self::CURSOR_KEY );
+		delete_transient( self::ATTACHMENT_IDS_KEY );
 		delete_option( self::INDEX_BUILT_KEY );
 
 		$total = self::get_total_post_count();
@@ -204,13 +206,36 @@ class Batch_Runner {
 		}
 	}
 
+	/**
+	 * Return all attachment IDs on the site, cached for the scan's duration.
+	 *
+	 * Previously re-queried (and array_flipped) on every cron tick and every
+	 * post save. The cache is invalidated when an attachment is added or
+	 * deleted (see Plugin::init), so a newly uploaded attachment is still
+	 * picked up as a valid reference target.
+	 *
+	 * @return int[]
+	 */
 	private static function get_all_attachment_ids(): array {
+		$cached = get_transient( self::ATTACHMENT_IDS_KEY );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$ids = $wpdb->get_col(
 			"SELECT ID FROM {$wpdb->posts}
 			WHERE post_type = 'attachment' AND post_status = 'inherit'"
 		);
-		return array_map( 'intval', $ids );
+		$ids = array_map( 'intval', $ids );
+
+		set_transient( self::ATTACHMENT_IDS_KEY, $ids, HOUR_IN_SECONDS );
+		return $ids;
+	}
+
+	/** Drop the cached attachment-ID set (on attachment add/delete). */
+	public static function flush_attachment_ids(): void {
+		delete_transient( self::ATTACHMENT_IDS_KEY );
 	}
 }

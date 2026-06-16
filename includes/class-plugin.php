@@ -52,5 +52,10 @@ class Plugin {
 		// Purge rows that reference an attachment when the attachment is deleted,
 		// otherwise the orphaned row would skew the used/unused counts.
 		add_action( 'delete_attachment', array( Index_Table::class, 'delete_for_attachment' ) );
+
+		// Invalidate the cached attachment-ID set whenever the library changes,
+		// so the scanner validates references against current attachments.
+		add_action( 'add_attachment', array( Batch_Runner::class, 'flush_attachment_ids' ) );
+		add_action( 'delete_attachment', array( Batch_Runner::class, 'flush_attachment_ids' ) );
 	}
 }
