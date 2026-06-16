@@ -1,5 +1,5 @@
 <?php
-namespace WP_Media_Audit\DB;
+namespace Attached_Media_Audit\DB;
 
 class Index_Table {
 
@@ -382,7 +382,7 @@ class Index_Table {
 					COALESCE(MAX(idx.missing_alt), 0) AS content_alt_missing
 				FROM {$posts_table} p
 				LEFT JOIN {$table} idx ON idx.attachment_id = p.ID
-				LEFT JOIN {$postmeta_table} pm_size ON pm_size.post_id = p.ID AND pm_size.meta_key = '_wp_media_audit_filesize'
+				LEFT JOIN {$postmeta_table} pm_size ON pm_size.post_id = p.ID AND pm_size.meta_key = '_Attached_Media_Audit_filesize'
 				WHERE {$full_where_sql}
 				GROUP BY p.ID
 				{$having_sql}

@@ -1,11 +1,11 @@
 <?php
-namespace WP_Media_Audit;
+namespace Attached_Media_Audit;
 
-use WP_Media_Audit\Admin\Admin_Menu;
-use WP_Media_Audit\Admin\Ajax_Handler;
-use WP_Media_Audit\Rest\Media_Controller;
-use WP_Media_Audit\Scanner\Batch_Runner;
-use WP_Media_Audit\DB\Index_Table;
+use Attached_Media_Audit\Admin\Admin_Menu;
+use Attached_Media_Audit\Admin\Ajax_Handler;
+use Attached_Media_Audit\Rest\Media_Controller;
+use Attached_Media_Audit\Scanner\Batch_Runner;
+use Attached_Media_Audit\DB\Index_Table;
 
 class Plugin {
 
@@ -19,10 +19,10 @@ class Plugin {
 	}
 
 	private function maybe_upgrade_db(): void {
-		$installed = get_option( 'wp_media_audit_db_version', '0' );
-		if ( version_compare( $installed, WP_MEDIA_AUDIT_VERSION, '<' ) ) {
+		$installed = get_option( 'Attached_Media_Audit_db_version', '0' );
+		if ( version_compare( $installed, ATTACHED_MEDIA_AUDIT_VERSION, '<' ) ) {
 			Index_Table::create();
-			update_option( 'wp_media_audit_db_version', WP_MEDIA_AUDIT_VERSION );
+			update_option( 'Attached_Media_Audit_db_version', ATTACHED_MEDIA_AUDIT_VERSION );
 		}
 	}
 

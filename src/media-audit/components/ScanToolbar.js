@@ -9,17 +9,17 @@ export default function ScanToolbar( { status, progress, total, onScan, onClear 
 		<div className="wp-media-audit-toolbar">
 			<div className="wp-media-audit-scan-status">
 				{ status === 'complete' && (
-					<span>{ __( 'Index is up to date.', 'wp-media-audit' ) }</span>
+					<span>{ __( 'Index is up to date.', 'attached-media-audit' ) }</span>
 				) }
 				{ status === 'idle' && (
-					<span>{ __( 'Index has not been built yet.', 'wp-media-audit' ) }</span>
+					<span>{ __( 'Index has not been built yet.', 'attached-media-audit' ) }</span>
 				) }
 			</div>
 			<Button variant="primary" onClick={ onScan } disabled={ isScanning }>
-				{ __( 'Scan Now', 'wp-media-audit' ) }
+				{ __( 'Scan Now', 'attached-media-audit' ) }
 			</Button>
 			<Button variant="secondary" isDestructive onClick={ onClear } disabled={ isScanning }>
-				{ __( 'Clear Index', 'wp-media-audit' ) }
+				{ __( 'Clear Index', 'attached-media-audit' ) }
 			</Button>
 			{ isScanning && (
 				<div className="wp-media-audit-progress">
@@ -32,7 +32,7 @@ export default function ScanToolbar( { status, progress, total, onScan, onClear 
 					<span className="wp-media-audit-progress-label">
 						{ sprintf(
 							/* translators: 1: processed count, 2: total count */
-							__( 'Scanning… %1$d / %2$d posts', 'wp-media-audit' ),
+							__( 'Scanning… %1$d / %2$d posts', 'attached-media-audit' ),
 							progress,
 							total
 						) }

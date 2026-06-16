@@ -1,5 +1,5 @@
 <?php
-namespace WP_Media_Audit\Scanner;
+namespace Attached_Media_Audit\Scanner;
 
 class Meta_Parser {
 

@@ -1,7 +1,7 @@
 <?php
-namespace WP_Media_Audit;
+namespace Attached_Media_Audit;
 
-use WP_Media_Audit\Scanner\Batch_Runner;
+use Attached_Media_Audit\Scanner\Batch_Runner;
 
 class Deactivator {
 

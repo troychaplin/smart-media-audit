@@ -1,7 +1,7 @@
 <?php
-namespace WP_Media_Audit\Admin;
+namespace Attached_Media_Audit\Admin;
 
-use WP_Media_Audit\Scanner\Batch_Runner;
+use Attached_Media_Audit\Scanner\Batch_Runner;
 
 class Admin_Menu {
 
@@ -13,54 +13,55 @@ class Admin_Menu {
 	public static function add_menu(): void {
 		add_submenu_page(
 			'upload.php',
-			__( 'Media Audit', 'wp-media-audit' ),
-			__( 'Media Audit', 'wp-media-audit' ),
+			__( 'Media Audit', 'attached-media-audit' ),
+			__( 'Media Audit', 'attached-media-audit' ),
 			'manage_options',
-			'wp-media-audit',
+			'attached-media-audit',
 			array( __CLASS__, 'render_page' )
 		);
 	}
 
 	public static function enqueue_assets( string $hook ): void {
-		if ( 'media_page_wp-media-audit' !== $hook ) {
+		if ( 'media_page_attached-media-audit' !== $hook ) {
 			return;
 		}
 
-		$asset_file = WP_MEDIA_AUDIT_DIR . 'build/media-audit-admin.asset.php';
+		$asset_file = ATTACHED_MEDIA_AUDIT_DIR . 'build/media-audit-admin.asset.php';
 		if ( ! file_exists( $asset_file ) ) {
 			return;
 		}
 		$asset = require $asset_file;
 
 		wp_enqueue_script(
-			'wp-media-audit-admin',
-			plugin_dir_url( WP_MEDIA_AUDIT_FILE ) . 'build/media-audit-admin.js',
+			'attached-media-audit-admin',
+			plugin_dir_url( ATTACHED_MEDIA_AUDIT_FILE ) . 'build/media-audit-admin.js',
 			$asset['dependencies'],
 			$asset['version'],
 			true
 		);
 
 		wp_enqueue_style(
-			'wp-media-audit-admin',
-			plugin_dir_url( WP_MEDIA_AUDIT_FILE ) . 'build/media-audit-admin.css',
+			'attached-media-audit-admin',
+			plugin_dir_url( ATTACHED_MEDIA_AUDIT_FILE ) . 'build/media-audit-admin.css',
 			array( 'wp-components' ),
 			$asset['version']
 		);
 
 		wp_add_inline_script(
-			'wp-media-audit-admin',
+			'attached-media-audit-admin',
 			'window.wpMediaAudit = ' . wp_json_encode( array(
 				'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
 				'nonce'           => wp_create_nonce( 'media_audit_nonce' ),
-				'restUrl'         => rest_url( 'wp-media-audit/v1/media' ),
+				'restUrl'         => rest_url( 'attached-media-audit/v1/media' ),
 				'restNonce'       => wp_create_nonce( 'wp_rest' ),
 				'initialProgress' => Batch_Runner::get_progress(),
+				'indexBuilt'      => (bool) get_option( Batch_Runner::INDEX_BUILT_KEY, false ),
 			) ) . ';',
 			'before'
 		);
 	}
 
 	public static function render_page(): void {
-		require_once WP_MEDIA_AUDIT_DIR . 'views/admin-page.php';
+		require_once ATTACHED_MEDIA_AUDIT_DIR . 'views/admin-page.php';
 	}
 }

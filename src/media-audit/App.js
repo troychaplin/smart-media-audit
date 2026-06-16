@@ -30,16 +30,17 @@ function formatFileSize( bytes ) {
 export default function App() {
 	const [ view, setView ]               = useState( DEFAULT_VIEW );
 	const [ scanVersion, setScanVersion ] = useState( 0 );
+	const [ indexBuilt, setIndexBuilt ]   = useState( () => window.wpMediaAudit?.indexBuilt ?? false );
 
 	const { items, totalItems, isLoading } = useMediaAudit( view, scanVersion );
 	const { status, progress, total, startScan, resetToIdle } = useScanProgress( {
-		onComplete: () => setScanVersion( ( v ) => v + 1 ),
+		onComplete: () => { setIndexBuilt( true ); setScanVersion( ( v ) => v + 1 ); },
 	} );
 
 	const handleClear = useCallback( async () => {
 		// eslint-disable-next-line no-alert
 		if ( ! window.confirm(
-			__( 'Clear the media index? All scan data will be removed. Run a new scan to rebuild it.', 'wp-media-audit' )
+			__( 'Clear the media index? All scan data will be removed. Run a new scan to rebuild it.', 'attached-media-audit' )
 		) ) return;
 
 		const { ajaxUrl, nonce } = window.wpMediaAudit;
@@ -49,6 +50,7 @@ export default function App() {
 
 		await fetch( ajaxUrl, { method: 'POST', body } ).catch( () => {} );
 
+		setIndexBuilt( false );
 		resetToIdle();
 		setScanVersion( ( v ) => v + 1 );
 	}, [ resetToIdle ] );
@@ -59,12 +61,12 @@ export default function App() {
 			count === 1
 				? sprintf(
 						/* translators: %s: file name */
-						__( 'Delete "%s"? This cannot be undone.', 'wp-media-audit' ),
+						__( 'Delete "%s"? This cannot be undone.', 'attached-media-audit' ),
 						selectedItems[ 0 ].title
 				  )
 				: sprintf(
 						/* translators: %d: number of files */
-						__( 'Delete %d files? This cannot be undone.', 'wp-media-audit' ),
+						__( 'Delete %d files? This cannot be undone.', 'attached-media-audit' ),
 						count
 				  );
 
@@ -88,7 +90,7 @@ export default function App() {
 		if ( ! window.confirm(
 			sprintf(
 				/* translators: %s: file name */
-				__( 'Delete "%s"? This cannot be undone.', 'wp-media-audit' ),
+				__( 'Delete "%s"? This cannot be undone.', 'attached-media-audit' ),
 				item.title
 			)
 		) ) return;
@@ -105,7 +107,7 @@ export default function App() {
 		() => [
 			{
 				id: 'thumbnail',
-				label: __( 'Preview', 'wp-media-audit' ),
+				label: __( 'Preview', 'attached-media-audit' ),
 				enableSorting: false,
 				enableHiding: false,
 				enableGlobalSearch: false,
@@ -113,7 +115,7 @@ export default function App() {
 			},
 			{
 				id: 'title',
-				label: __( 'File Name', 'wp-media-audit' ),
+				label: __( 'File Name', 'attached-media-audit' ),
 				enableSorting: true,
 				enableHiding: false,
 				enableGlobalSearch: true,
@@ -123,50 +125,50 @@ export default function App() {
 			},
 			{
 				id: 'media_type',
-				label: __( 'Type', 'wp-media-audit' ),
+				label: __( 'Type', 'attached-media-audit' ),
 				enableSorting: false,
 				elements: [
-					{ value: 'Image', label: __( 'Image', 'wp-media-audit' ) },
-					{ value: 'Video', label: __( 'Video', 'wp-media-audit' ) },
-					{ value: 'Audio', label: __( 'Audio', 'wp-media-audit' ) },
-					{ value: 'Document', label: __( 'Document', 'wp-media-audit' ) },
+					{ value: 'Image', label: __( 'Image', 'attached-media-audit' ) },
+					{ value: 'Video', label: __( 'Video', 'attached-media-audit' ) },
+					{ value: 'Audio', label: __( 'Audio', 'attached-media-audit' ) },
+					{ value: 'Document', label: __( 'Document', 'attached-media-audit' ) },
 				],
 				filterBy: { isPrimary: true, operators: [ 'is' ] },
 			},
 			{
 				id: 'reference_type',
-				label: __( 'Location', 'wp-media-audit' ),
+				label: __( 'Location', 'attached-media-audit' ),
 				enableSorting: false,
 				elements: [
-					{ value: 'block', label: __( 'Block', 'wp-media-audit' ) },
-					{ value: 'featured_image', label: __( 'Featured Image', 'wp-media-audit' ) },
-					{ value: 'classic', label: __( 'Classic Editor', 'wp-media-audit' ) },
-					{ value: 'postmeta', label: __( 'Post Meta', 'wp-media-audit' ) },
+					{ value: 'block', label: __( 'Block', 'attached-media-audit' ) },
+					{ value: 'featured_image', label: __( 'Featured Image', 'attached-media-audit' ) },
+					{ value: 'classic', label: __( 'Classic Editor', 'attached-media-audit' ) },
+					{ value: 'postmeta', label: __( 'Post Meta', 'attached-media-audit' ) },
 				],
 				filterBy: { isPrimary: true, operators: [ 'is' ] },
 			},
 			{
 				id: 'usage_status',
-				label: __( 'Usage', 'wp-media-audit' ),
+				label: __( 'Usage', 'attached-media-audit' ),
 				enableSorting: false,
 				getValue: ( { item } ) => item.usage_count === 0 ? 'unused' : 'used',
 				elements: [
-					{ value: 'used', label: __( 'Used', 'wp-media-audit' ) },
-					{ value: 'unused', label: __( 'Unused', 'wp-media-audit' ) },
+					{ value: 'used', label: __( 'Used', 'attached-media-audit' ) },
+					{ value: 'unused', label: __( 'Unused', 'attached-media-audit' ) },
 				],
 				filterBy: { isPrimary: true, operators: [ 'is' ] },
 			},
 			{
 				id: 'usage',
-				label: __( 'Used In', 'wp-media-audit' ),
+				label: __( 'Used In', 'attached-media-audit' ),
 				enableSorting: true,
 				enableGlobalSearch: false,
 				getValue: ( { item } ) => item.usage_count,
-				render: ( { item } ) => <UsedInCell item={ item } />,
+				render: ( { item } ) => <UsedInCell item={ item } indexBuilt={ indexBuilt } />,
 			},
 			{
 				id: 'file_size',
-				label: __( 'Size', 'wp-media-audit' ),
+				label: __( 'Size', 'attached-media-audit' ),
 				enableSorting: true,
 				enableGlobalSearch: false,
 				getValue: ( { item } ) => item.file_size,
@@ -174,21 +176,21 @@ export default function App() {
 			},
 			{
 				id: 'alt_text',
-				label: __( 'Alt Text', 'wp-media-audit' ),
+				label: __( 'Alt Text', 'attached-media-audit' ),
 				enableSorting: false,
 				enableGlobalSearch: false,
 				render: ( { item } ) => {
 					if ( item.media_type !== 'Image' || ! item.content_alt_missing ) return null;
 					return (
 						<span className="wp-media-audit-no-alt">
-							{ __( 'No alt', 'wp-media-audit' ) }
+							{ __( 'No alt', 'attached-media-audit' ) }
 						</span>
 					);
 				},
 			},
 			{
 				id: 'date',
-				label: __( 'Date', 'wp-media-audit' ),
+				label: __( 'Date', 'attached-media-audit' ),
 				enableSorting: true,
 				enableGlobalSearch: false,
 				getValue: ( { item } ) => item.date,
@@ -207,7 +209,7 @@ export default function App() {
 		() => [
 			{
 				id: 'delete',
-				label: __( 'Delete', 'wp-media-audit' ),
+				label: __( 'Delete', 'attached-media-audit' ),
 				isDestructive: true,
 				isEligible: ( item ) => item.usage_count === 0,
 				callback: handleDeleteItems,

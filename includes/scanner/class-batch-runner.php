@@ -1,7 +1,7 @@
 <?php
-namespace WP_Media_Audit\Scanner;
+namespace Attached_Media_Audit\Scanner;
 
-use WP_Media_Audit\DB\Index_Table;
+use Attached_Media_Audit\DB\Index_Table;
 
 class Batch_Runner {
 
@@ -9,6 +9,7 @@ class Batch_Runner {
 	const BATCH_SIZE    = 50;
 	const CURSOR_KEY    = 'media_audit_cursor';
 	const PROGRESS_KEY  = 'media_audit_progress';
+	const INDEX_BUILT_KEY = 'media_audit_index_built';
 
 	/** Post types scanned for media references. */
 	const SCAN_POST_TYPES = array( 'post', 'page', 'wp_template', 'wp_template_part' );
@@ -35,6 +36,7 @@ class Batch_Runner {
 		self::unschedule();
 		Index_Table::truncate();
 		delete_transient( self::CURSOR_KEY );
+		delete_option( self::INDEX_BUILT_KEY );
 
 		$total = self::get_total_post_count();
 		update_option( self::PROGRESS_KEY, array(
@@ -74,6 +76,7 @@ class Batch_Runner {
 		if ( count( $ids ) < self::BATCH_SIZE ) {
 			// Final (short) batch — done.
 			delete_transient( self::CURSOR_KEY );
+			update_option( self::INDEX_BUILT_KEY, true, false );
 			update_option( self::PROGRESS_KEY, array(
 				'status'   => 'complete',
 				'progress' => $total,
@@ -169,7 +172,7 @@ class Batch_Runner {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$ids = $wpdb->get_col(
 			"SELECT p.ID FROM {$wpdb->posts} p
-			LEFT JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_wp_media_audit_filesize'
+			LEFT JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID AND pm.meta_key = '_Attached_Media_Audit_filesize'
 			WHERE p.post_type = 'attachment' AND p.post_status = 'inherit'
 			AND pm.meta_id IS NULL"
 		);
@@ -188,7 +191,7 @@ class Batch_Runner {
 				}
 			}
 			if ( $file_size > 0 ) {
-				update_post_meta( $id, '_wp_media_audit_filesize', $file_size );
+				update_post_meta( $id, '_Attached_Media_Audit_filesize', $file_size );
 			}
 		}
 	}

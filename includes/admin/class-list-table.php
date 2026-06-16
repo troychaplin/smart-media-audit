@@ -1,7 +1,7 @@
 <?php
-namespace WP_Media_Audit\Admin;
+namespace Attached_Media_Audit\Admin;
 
-use WP_Media_Audit\DB\Index_Table;
+use Attached_Media_Audit\DB\Index_Table;
 
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
@@ -19,11 +19,11 @@ class List_Table extends \WP_List_Table {
 
 	public function get_columns(): array {
 		return array(
-			'thumbnail'  => __( 'Preview', 'wp-media-audit' ),
-			'post_title' => __( 'File Name', 'wp-media-audit' ),
-			'mime_type'  => __( 'Type', 'wp-media-audit' ),
-			'usage'      => __( 'Used In', 'wp-media-audit' ),
-			'post_date'  => __( 'Date', 'wp-media-audit' ),
+			'thumbnail'  => __( 'Preview', 'attached-media-audit' ),
+			'post_title' => __( 'File Name', 'attached-media-audit' ),
+			'mime_type'  => __( 'Type', 'attached-media-audit' ),
+			'usage'      => __( 'Used In', 'attached-media-audit' ),
+			'post_date'  => __( 'Date', 'attached-media-audit' ),
 		);
 	}
 
@@ -86,9 +86,9 @@ class List_Table extends \WP_List_Table {
 			esc_url( $edit ),
 			$name,
 			esc_url( $url ),
-			__( 'View', 'wp-media-audit' ),
+			__( 'View', 'attached-media-audit' ),
 			esc_url( $edit ),
-			__( 'Edit', 'wp-media-audit' )
+			__( 'Edit', 'attached-media-audit' )
 		);
 	}
 
@@ -100,14 +100,14 @@ class List_Table extends \WP_List_Table {
 	protected function column_usage( $item ): string {
 		$count = (int) $item->usage_count;
 		if ( 0 === $count ) {
-			return '<span class="media-audit-unused">' . __( 'Unused', 'wp-media-audit' ) . '</span>';
+			return '<span class="media-audit-unused">' . __( 'Unused', 'attached-media-audit' ) . '</span>';
 		}
 
 		return sprintf(
 			'<button class="button-link media-audit-locations-toggle" data-id="%d" aria-expanded="false">%s</button>'
 			. '<span class="media-audit-locations-row" id="media-audit-loc-%d" hidden></span>',
 			esc_attr( $item->ID ),
-			sprintf( _n( '%d post', '%d posts', $count, 'wp-media-audit' ), $count ),
+			sprintf( _n( '%d post', '%d posts', $count, 'attached-media-audit' ), $count ),
 			esc_attr( $item->ID )
 		);
 	}
@@ -118,7 +118,7 @@ class List_Table extends \WP_List_Table {
 
 	/** Render the "no items" message. */
 	public function no_items(): void {
-		esc_html_e( 'No media items found.', 'wp-media-audit' );
+		esc_html_e( 'No media items found.', 'attached-media-audit' );
 	}
 
 	/**
@@ -132,16 +132,16 @@ class List_Table extends \WP_List_Table {
 		// Preserve an active search when switching tabs (false omits it when empty).
 		$base = add_query_arg(
 			array(
-				'page' => 'wp-media-audit',
+				'page' => 'attached-media-audit',
 				's'    => '' !== $search ? $search : false,
 			),
 			admin_url( 'upload.php' )
 		);
 
 		$tabs = array(
-			'all'    => array( 'label' => __( 'All', 'wp-media-audit' ),    'count' => $counts['total'] ),
-			'used'   => array( 'label' => __( 'Used', 'wp-media-audit' ),   'count' => $counts['used'] ),
-			'unused' => array( 'label' => __( 'Unused', 'wp-media-audit' ), 'count' => $counts['unused'] ),
+			'all'    => array( 'label' => __( 'All', 'attached-media-audit' ),    'count' => $counts['total'] ),
+			'used'   => array( 'label' => __( 'Used', 'attached-media-audit' ),   'count' => $counts['used'] ),
+			'unused' => array( 'label' => __( 'Unused', 'attached-media-audit' ), 'count' => $counts['unused'] ),
 		);
 
 		$views = array();

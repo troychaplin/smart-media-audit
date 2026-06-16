@@ -2,7 +2,7 @@ import { useState, useRef } from '@wordpress/element';
 import { Button, Popover, Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-export default function UsedInCell( { item } ) {
+export default function UsedInCell( { item, indexBuilt } ) {
 	const [ isOpen, setIsOpen ]       = useState( false );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ locations, setLocations ] = useState( null );
@@ -10,7 +10,10 @@ export default function UsedInCell( { item } ) {
 	const cacheRef  = useRef( null );
 
 	if ( item.usage_count === 0 ) {
-		return <span className="wp-media-audit-unused">{ __( 'Unused', 'wp-media-audit' ) }</span>;
+		if ( ! indexBuilt ) {
+			return <span className="wp-media-audit-unscanned">{ __( 'Scan required', 'attached-media-audit' ) }</span>;
+		}
+		return <span className="wp-media-audit-unused">{ __( 'Unused', 'attached-media-audit' ) }</span>;
 	}
 
 	const fetchLocations = () => {
@@ -40,10 +43,10 @@ export default function UsedInCell( { item } ) {
 
 	const label =
 		item.usage_count === 1
-			? __( '1 post', 'wp-media-audit' )
+			? __( '1 post', 'attached-media-audit' )
 			: sprintf(
 					/* translators: %d: number of posts */
-					__( '%d posts', 'wp-media-audit' ),
+					__( '%d posts', 'attached-media-audit' ),
 					item.usage_count
 			  );
 

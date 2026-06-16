@@ -1,8 +1,8 @@
 <?php
-namespace WP_Media_Audit\Admin;
+namespace Attached_Media_Audit\Admin;
 
-use WP_Media_Audit\Scanner\Batch_Runner;
-use WP_Media_Audit\DB\Index_Table;
+use Attached_Media_Audit\Scanner\Batch_Runner;
+use Attached_Media_Audit\DB\Index_Table;
 
 class Ajax_Handler {
 
@@ -70,6 +70,7 @@ class Ajax_Handler {
 		Batch_Runner::unschedule();
 		Index_Table::truncate();
 		delete_transient( Batch_Runner::CURSOR_KEY );
+		delete_option( Batch_Runner::INDEX_BUILT_KEY );
 		update_option( Batch_Runner::PROGRESS_KEY, array(
 			'status'   => 'idle',
 			'progress' => 0,

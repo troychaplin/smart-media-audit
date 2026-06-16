@@ -1,5 +1,5 @@
 {
-	"name": "wp-media-audit",
+	"name": "attached-media-audit",
 	"private": true,
 	"packageManager": "pnpm@10.33.4",
 	"pnpm": {
@@ -15,11 +15,11 @@
 		"start": "wp-scripts start"
 	},
 	"devDependencies": {
-		"@wordpress/api-fetch": "^7.47.0",
-		"@wordpress/components": "^34.0.0",
-		"@wordpress/dataviews": "^15.0.0",
-		"@wordpress/element": "^7.0.0",
-		"@wordpress/i18n": "^6.20.0",
-		"@wordpress/scripts": "^32.3.0"
+		"@wordpress/api-fetch": "^7.48.0",
+		"@wordpress/components": "^35.0.0",
+		"@wordpress/dataviews": "^16.0.0",
+		"@wordpress/element": "^8.0.0",
+		"@wordpress/i18n": "^6.21.0",
+		"@wordpress/scripts": "^32.4.0"
 	}
 }

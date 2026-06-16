@@ -6,7 +6,7 @@ export default function TitleCell( { item, onDelete } ) {
 			<strong>{ item.title }</strong>
 			<div className="wp-media-audit-row-actions">
 				<span>
-					<a href={ item.edit_url }>{ __( 'Edit', 'wp-media-audit' ) }</a>
+					<a href={ item.edit_url }>{ __( 'Edit', 'attached-media-audit' ) }</a>
 				</span>
 				<span className="wp-media-audit-row-actions__sep"> | </span>
 				<span>
@@ -18,19 +18,19 @@ export default function TitleCell( { item, onDelete } ) {
 							onDelete( item );
 						} }
 					>
-						{ __( 'Delete Permanently', 'wp-media-audit' ) }
+						{ __( 'Delete Permanently', 'attached-media-audit' ) }
 					</a>
 				</span>
 				<span className="wp-media-audit-row-actions__sep"> | </span>
 				<span>
 					<a href={ item.file_url } target="_blank" rel="noreferrer">
-						{ __( 'View', 'wp-media-audit' ) }
+						{ __( 'View', 'attached-media-audit' ) }
 					</a>
 				</span>
 				<span className="wp-media-audit-row-actions__sep"> | </span>
 				<span>
 					<a href={ item.file_url } download>
-						{ __( 'Download file', 'wp-media-audit' ) }
+						{ __( 'Download file', 'attached-media-audit' ) }
 					</a>
 				</span>
 			</div>

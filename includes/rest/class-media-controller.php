@@ -1,7 +1,7 @@
 <?php
-namespace WP_Media_Audit\Rest;
+namespace Attached_Media_Audit\Rest;
 
-use WP_Media_Audit\DB\Index_Table;
+use Attached_Media_Audit\DB\Index_Table;
 use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -9,7 +9,7 @@ use WP_REST_Server;
 
 class Media_Controller extends WP_REST_Controller {
 
-	protected $namespace = 'wp-media-audit/v1';
+	protected $namespace = 'attached-media-audit/v1';
 	protected $rest_base = 'media';
 
 	public function register_routes(): void {
@@ -80,7 +80,7 @@ class Media_Controller extends WP_REST_Controller {
 		$thumbnail_url = $thumb_src ? $thumb_src[0] : '';
 
 		// Check cached file size first to avoid reading the filesystem on every request.
-		$cached    = get_post_meta( $id, '_wp_media_audit_filesize', true );
+		$cached    = get_post_meta( $id, '_Attached_Media_Audit_filesize', true );
 		$file_size = $cached ? (int) $cached : 0;
 		if ( ! $file_size ) {
 			$meta = wp_get_attachment_metadata( $id );
@@ -95,7 +95,7 @@ class Media_Controller extends WP_REST_Controller {
 			}
 		}
 		if ( $file_size > 0 && ! $cached ) {
-			update_post_meta( $id, '_wp_media_audit_filesize', $file_size );
+			update_post_meta( $id, '_Attached_Media_Audit_filesize', $file_size );
 		}
 
 		$alt_text = get_post_meta( $id, '_wp_attachment_image_alt', true ) ?: '';
