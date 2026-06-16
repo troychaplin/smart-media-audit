@@ -1,8 +1,8 @@
+<img src="assets/banner-772x250.png" alt="Attached Media Audit" style="width: 100%; height: auto;">
+
 # Attached: Media Audit
 
 A WordPress plugin that audits your media library — showing which files are used, where they appear, and which are safe to clean up.
-
----
 
 ## Features
 
@@ -14,15 +14,11 @@ A WordPress plugin that audits your media library — showing which files are us
 - Row actions: **Edit**, **View**, **Download**, **Delete Permanently**
 - **Clear Index** resets scan data; **Scan Now** triggers a fresh full scan
 
----
-
 ## Requirements
 
 - WordPress 6.6+
 - PHP 8.0+
 - Node.js + pnpm (for development builds)
-
----
 
 ## Installation
 
@@ -31,8 +27,6 @@ A WordPress plugin that audits your media library — showing which files are us
 3. Activate the plugin in **Plugins → Installed Plugins**.
 4. Navigate to **Media → Media Audit**.
 5. Click **Scan Now** to index your media library.
-
----
 
 ## Admin UI
 
@@ -55,8 +49,6 @@ Found under **Media → Media Audit**. The table shows all attachments with the 
 - **Scan required** — the index has not been built yet (or was cleared)
 - **Unused** — the index is built and this file has no detected references
 - **N posts** — the file is referenced by N posts; click to see them
-
----
 
 ## Architecture
 
@@ -102,8 +94,6 @@ File sizes are cached in post meta (`_Attached_Media_Audit_filesize`) on the fir
 
 The DB version is tracked in the `Attached_Media_Audit_db_version` option. Bumping `ATTACHED_MEDIA_AUDIT_VERSION` in `attached.php` triggers `dbDelta()` automatically on the next page load via `Plugin::maybe_upgrade_db()`.
 
----
-
 ## Development
 
 ```bash
@@ -142,8 +132,6 @@ src/media-audit/
   styles.scss
 ```
 
----
-
 ## Hooks
 
 **`media_audit_scanned_meta_keys`** — Filter the list of post meta keys the scanner checks for attachment IDs.
@@ -154,8 +142,6 @@ add_filter( 'media_audit_scanned_meta_keys', function( array $keys ): array {
     return $keys;
 } );
 ```
-
----
 
 ## License
 
